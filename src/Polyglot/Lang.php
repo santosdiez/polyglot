@@ -117,6 +117,7 @@ class Lang extends Translator
 		$this->locale = $locale;
 		$locales = array(
 			'en' => 'en_US',
+			'es' => 'es_ES',
 			'zh' => 'zh_CN',
 		);
 

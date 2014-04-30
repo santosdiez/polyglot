@@ -16,8 +16,8 @@ class Router extends IlluminateRouter
 	/**
 	 * Create a localized route group
 	 *
-	 * @param array   $group
-	 * @param Closure $callback
+	 * @param  array   $group
+	 * @param  Closure $callback
 	 *
 	 * @return Closure
 	 */
@@ -38,7 +38,7 @@ class Router extends IlluminateRouter
 	public function getRoutesPrefix($group = array())
 	{
 		// Get locale
-		$locale = $this->container['url']->locale();
+		$locale = $this->container['url']->locale() ?: $this->container['config']->get('polyglot::default');
 
 		// Cancel if invalid locale in URL
 		if (!$this->container['translator']->valid($locale)) {
