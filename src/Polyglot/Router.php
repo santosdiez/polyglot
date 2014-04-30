@@ -49,7 +49,7 @@ class Router extends IlluminateRouter
 		$this->container['translator']->setLocale($locale);
 
 		// Return group untouched if default
-		if ($locale == $this->container['config']->get('polyglot::default')) {
+		if ($locale == $this->container['config']->get('polyglot::default') && !$this->container['url']->locale()) {
 			return $group;
 		}
 
