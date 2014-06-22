@@ -2,7 +2,6 @@
 namespace Polyglot\TestCases;
 
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Lang;
 use Polyglot\PolyglotServiceProvider;
 
 abstract class PolyglotTestCase extends ContainerTestCase
@@ -15,10 +14,13 @@ abstract class PolyglotTestCase extends ContainerTestCase
 		parent::setUp();
 
 		// Bind Polyglot classes
-		$this->app = PolyglotServiceProvider::make($this->app);
+		$provider = new PolyglotServiceProvider($this->app);
+		$provider->register();
+		$provider->boot();
+
+		$this->app['translator'] = $this->app['polyglot.translator'];
 
 		// Configure facades
 		Config::setFacadeApplication($this->app);
-		Lang::swap($this->app['polyglot.translator']);
 	}
 }

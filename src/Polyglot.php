@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Lang as LangFacade;
 abstract class Polyglot extends Model
 {
 	/**
-	 * An array of polyglot attributes
+	 * The attributes to translate
 	 *
 	 * @var array
 	 */
@@ -25,7 +25,6 @@ abstract class Polyglot extends Model
 	protected static function boot()
 	{
 		static::saving(function ($model) {
-
 			$polyglotAttributes = $model->getPolyglotAttributes();
 
 			// Get the model's attributes
@@ -52,7 +51,7 @@ abstract class Polyglot extends Model
 			$translated['lang'] = $lang;
 
 			// Save new model
-			if (! $model->exists) {
+			if (!$model->exists) {
 				$model->save();
 			}
 
@@ -132,7 +131,7 @@ abstract class Polyglot extends Model
 	public function __call($method, $parameters)
 	{
 		// If the model supports the locale, load it
-		if (in_array($method, $this->getLocales())) {
+		if (in_array($method, $this->getAvailable())) {
 			return $this->hasOne($this->getLangClass())->whereLang($method);
 		}
 
@@ -172,7 +171,7 @@ abstract class Polyglot extends Model
 		}
 
 		// If the model supports the locale, load and return it
-		if (in_array($key, $this->getLocales())) {
+		if (in_array($key, $this->getAvailable())) {
 			$relation = $this->hasOne($this->getLangClass())->whereLang($key);
 
 			if ($relation->getResults() === null) {
@@ -185,8 +184,15 @@ abstract class Polyglot extends Model
 		// If the attribute is set to be automatically localized
 		if ($this->polyglot) {
 			if (in_array($key, $this->polyglot)) {
-				$lang = LangFacade::getLocale();
 
+				/**
+				 * If query executed with join and a property is already there
+				 */
+				if (isset($this->attributes[$key])) {
+					return $this->attributes[$key];
+				}
+
+				$lang = LangFacade::getLocale();
 				return $this->$lang ? $this->$lang->$key : null;
 			}
 		}
@@ -277,7 +283,7 @@ abstract class Polyglot extends Model
 	 *
 	 * @return array
 	 */
-	protected function getLocales()
+	protected function getAvailable()
 	{
 		return Config::get('polyglot::locales');
 	}
